@@ -35,6 +35,32 @@ class ErrorResponseSchema(Schema):
     success = fields.Bool(required=False)
 
 
+# ============================================================================
+# Schémas pour les endpoints Common (fetch_history)
+# ============================================================================
+
+class ChatItemSchema(Schema):
+    """Schéma pour un élément de chat dans la liste."""
+    chat_id = fields.Str(required=True)
+    chat_title = fields.Str(required=True)
+
+
+class MessageObjectSchema(Schema):
+    """Schéma pour un message dans l'historique."""
+    role = fields.Str(required=True)
+    text_content = fields.Str(required=True)
+
+
+class LoadPreviousChatResponseSchema(Schema):
+    """Schéma de validation pour la réponse de /load_previous_chat."""
+    id = fields.Str(required=True)
+    mode = fields.Str(required=False, allow_none=True)
+    mode_id = fields.Str(required=False, allow_none=True)
+    mode_version = fields.Str(required=False, allow_none=True)
+    kb = fields.Str(required=False, allow_none=True)
+    message_objects_list = fields.List(fields.Nested(MessageObjectSchema), required=True)
+
+
 # Langues supportées
 SUPPORTED_LANGUAGES = [
     "en", "nl", "fi", "fr", "de", "ga", "it", "sv", "ca", "hr", "cs", "da",

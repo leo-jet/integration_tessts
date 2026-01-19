@@ -43,7 +43,7 @@ def apps() -> List[Dict[str, Any]]:
     return app_loader.load_apps()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def filter_apps_by(apps: List[Dict[str, Any]]) -> Callable:
     """
     Factory fixture pour filtrer les applications.
@@ -75,7 +75,7 @@ def filter_apps_by(apps: List[Dict[str, Any]]) -> Callable:
 # Fixtures pour le client API
 # ============================================================================
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def api_client(base_url: str) -> APIClient:
     """
     Client API pour effectuer les requêtes HTTP.

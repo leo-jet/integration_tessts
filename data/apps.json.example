@@ -1,7 +1,7 @@
 [
   {
     "app_id": "00000000-0000-0000-0000-000000000000",
-    "app_name": "your-application-name",
+    "app_name": "your-application-name-crm",
     "date": "2026-01-01",
     "role_priority": "app",
     "domain": null,
@@ -21,5 +21,49 @@
     },
     "fetch_history": 0,
     "mutualize_with": 0
+  },
+  {
+    "app_id": "11111111-1111-1111-1111-111111111111",
+    "app_name": "your-application-name-origin",
+    "date": "2026-01-01",
+    "role_priority": "app",
+    "domain": null,
+    "country": "us",
+    "lang": "en",
+    "webshop": "example.com",
+    "roles": [
+      "chat_history"
+    ],
+    "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
+    "oauth_config": {
+      "client_id_env_var": "APP_CLIENT_ID",
+      "client_secret_env_var": "APP_CLIENT_SECRET",
+      "tenant_id": "00000000-0000-0000-0000-000000000000",
+      "scope": "api://00000000-0000-0000-0000-000000000000/.default"
+    },
+    "fetch_history": 1,
+    "mutualize_with": 0
+  },
+  {
+    "app_id": "22222222-2222-2222-2222-222222222222",
+    "app_name": "your-application-name-mutualized",
+    "date": "2026-01-01",
+    "role_priority": "app",
+    "domain": null,
+    "country": "us",
+    "lang": "en",
+    "webshop": "example.com",
+    "roles": [
+      "chat_history"
+    ],
+    "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
+    "oauth_config": {
+      "client_id_env_var": "APP_CLIENT_ID",
+      "client_secret_env_var": "APP_CLIENT_SECRET",
+      "tenant_id": "00000000-0000-0000-0000-000000000000",
+      "scope": "api://00000000-0000-0000-0000-000000000000/.default"
+    },
+    "fetch_history": 1,
+    "mutualize_with": "11111111-1111-1111-1111-111111111111"
   }
 ]

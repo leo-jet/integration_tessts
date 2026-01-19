@@ -20,6 +20,14 @@ integration_tests/
 │   ├── conftest.py              # Fixtures spécifiques CRM
 │   └── test_business_scenario.py # Test métier complet
 │
+├── test_common/                   # Tests Common (fetch_history)
+│   ├── conftest.py              # Fixtures spécifiques Common
+│   ├── test_get_recent_chats.py # Test récupération des chats
+│   ├── test_get_recent_chats_unauthorized.py # Test accès refusé
+│   ├── test_get_recent_chats_mutualize.py # Test mutualisation
+│   ├── test_load_previous_chat.py # Test chargement d'un chat
+│   └── test_load_previous_chat_unauthorized.py # Test accès refusé
+│
 ├── conftest.py                   # Fixtures globales
 ├── requirements.txt              # Dépendances
 ├── .env.example                  # Template variables d'environnement
@@ -34,6 +42,14 @@ integration_tests/
    - ✅ Validation Marshmallow des réponses
    - ✅ Vérification de la structure JSON
    - ✅ Validation du contenu métier (summary, topics, actions)
+
+### ✅ Common (fetch_history) - `/get_recent_chats` et `/load_previous_chat`
+   - ✅ Test de récupération de la liste des chats récents
+   - ✅ Test de chargement d'un chat avec historique
+   - ✅ Tests d'accès non autorisé (apps sans fetch_history)
+   - ✅ Test de mutualisation des chats (mutualize_with)
+   - ✅ Validation Marshmallow des réponses
+   - ✅ Vérification de la structure des messages
 
 ## 🚀 Quick Start
 
@@ -65,8 +81,14 @@ cp data/apps.json.example data/apps.json
 ```
 
 ### 4. Lancer les tests
+Tests Common (fetch_history)
+pytest test_common/ -v
 
-```bash
+# Tous les tests
+pytest -v
+
+# Avec logs détaillés
+pytest
 # Tests CRM
 pytest test_crm_visit_report/ -v
 
