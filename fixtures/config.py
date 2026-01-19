@@ -19,14 +19,8 @@ class Config:
     API_BASE_URL: str = os.getenv("API_BASE_URL")
     API_TIMEOUT: int = int(os.getenv("API_TIMEOUT", "30"))
     
-    # Azure OAuth Configuration
+    # Azure OAuth Configuration (optionnel si tenant_id est dans apps.json)
     AZURE_TENANT_ID: str = os.getenv("AZURE_TENANT_ID", "")
-    
-    # OAuth2 Token URL
-    @classmethod
-    def get_token_url(cls) -> str:
-        """Retourne l'URL pour obtenir le token OAuth2."""
-        return f"https://login.microsoftonline.com/{cls.AZURE_TENANT_ID}/oauth2/v2.0/token"
     
     # Retry Configuration
     RETRY_MAX_ATTEMPTS: int = int(os.getenv("RETRY_MAX_ATTEMPTS", "3"))
@@ -36,10 +30,9 @@ class Config:
     @classmethod
     def validate(cls) -> None:
         """Valide que toutes les configurations requises sont présentes."""
-        if not cls.AZURE_TENANT_ID:
-            raise ValueError("AZURE_TENANT_ID is required in .env file")
         if not cls.API_BASE_URL:
             raise ValueError("API_BASE_URL is required in .env file")
+        # Note: AZURE_TENANT_ID est optionnel si spécifié dans oauth_config de chaque app
 
 
 # Valider la configuration au chargement

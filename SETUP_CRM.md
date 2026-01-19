@@ -48,13 +48,15 @@ cp .env.example .env
 # API Configuration
 API_BASE_URL=https://your-api-endpoint.com
 
-# Azure OAuth2 Configuration
+# Azure OAuth2 Configuration (optionnel si tenant_id dans apps.json)
 AZURE_TENANT_ID=12345678-90ab-cdef-1234-567890abcdef
 
 # Application Credentials
 APP_CLIENT_ID=12345678-90ab-cdef-1234-567890abcdef
 APP_CLIENT_SECRET=your_actual_secret_value_here
 ```
+
+**Note** : Le `AZURE_TENANT_ID` dans .env est optionnel si chaque app définit son propre `tenant_id` dans `oauth_config`.
 
 ### 3. Créer le fichier data/apps.json
 
@@ -85,6 +87,7 @@ cp data/apps.json.example data/apps.json
     "oauth_config": {
       "client_id_env_var": "APP_CLIENT_ID",
       "client_secret_env_var": "APP_CLIENT_SECRET",
+      "tenant_id": "12345678-90ab-cdef-1234-567890abcdef",
       "scope": "api://00000000-0000-0000-0000-000000000000/.default"
     },
     "fetch_history": 0,
@@ -93,7 +96,9 @@ cp data/apps.json.example data/apps.json
 ]
 ```
 
-**Important** : Remplacer `YOUR_SUBSCRIPTION_KEY_HERE` par votre vraie clé de souscription API.
+**Important** : 
+- Remplacer `YOUR_SUBSCRIPTION_KEY_HERE` par votre vraie clé de souscription API
+- Le `tenant_id` dans `oauth_config` spécifie le tenant Azure AD pour cette app
 
 ## ✅ Vérification de la configuration
 
@@ -232,7 +237,8 @@ cp data/apps.json.example data/apps.json
 
 ➡️ Vérifier les credentials dans `.env` :
 
-```bash
+# Utiliser le tenant_id de votre app
+curl -X POST "https://login.microsoftonline.com/YOUR
 # Tester manuellement l'authentification OAuth2
 curl -X POST "https://login.microsoftonline.com/$AZURE_TENANT_ID/oauth2/v2.0/token" \
   -d "grant_type=client_credentials" \

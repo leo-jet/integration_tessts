@@ -14,6 +14,7 @@ class OAuthConfigSchema(Schema):
     """Schéma de validation pour oauth_config."""
     client_id_env_var = fields.Str(required=True)
     client_secret_env_var = fields.Str(required=True)
+    tenant_id = fields.Str(required=True)
     scope = fields.Str(required=True)
 
 

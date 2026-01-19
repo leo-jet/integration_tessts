@@ -16,6 +16,7 @@
     "oauth_config": {
       "client_id_env_var": "APP_CLIENT_ID",
       "client_secret_env_var": "APP_CLIENT_SECRET",
+      "tenant_id": "00000000-0000-0000-0000-000000000000",
       "scope": "api://00000000-0000-0000-0000-000000000000/.default"
     },
     "fetch_history": 0,

@@ -40,9 +40,10 @@ class OAuth2Client:
         # Récupérer les variables d'environnement
         client_id_env = oauth_config.get("client_id_env_var")
         client_secret_env = oauth_config.get("client_secret_env_var")
+        tenant_id = oauth_config.get("tenant_id")
         scope = oauth_config.get("scope")
         
-        if not all([client_id_env, client_secret_env, scope]):
+        if not all([client_id_env, client_secret_env, tenant_id, scope]):
             raise AuthenticationError(
                 f"Missing OAuth config for app {app.get('app_name')}"
             )
@@ -64,7 +65,7 @@ class OAuth2Client:
                 return cached["access_token"]
         
         # Obtenir un nouveau token
-        token_data = self._request_token(client_id, client_secret, scope)
+        token_data = self._request_token(client_id, client_secret, tenant_id, scope)
         
         # Mettre en cache
         self._token_cache[cache_key] = {
@@ -78,6 +79,7 @@ class OAuth2Client:
         self,
         client_id: str,
         client_secret: str,
+        tenant_id: str,
         scope: str
     ) -> Dict[str, Any]:
         """
@@ -86,6 +88,7 @@ class OAuth2Client:
         Args:
             client_id: Client ID de l'application
             client_secret: Client Secret de l'application
+            tenant_id: Tenant ID Azure AD
             scope: Scope OAuth2
             
         Returns:
@@ -94,7 +97,7 @@ class OAuth2Client:
         Raises:
             AuthenticationError: Si toutes les tentatives échouent
         """
-        url = Config.get_token_url()
+        url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         
         data = {
             "grant_type": "client_credentials",
