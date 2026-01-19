@@ -6,6 +6,7 @@ depuis une knowledge base spécifiée et retourne une réponse en streaming SSE.
 """
 import pytest
 from typing import List, Dict, Any
+import uuid
 
 
 @pytest.fixture(scope="module")

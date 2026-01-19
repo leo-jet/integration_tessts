@@ -14,7 +14,8 @@ import json
 
 def test_extract_from_knowledge_base_streaming(
     api_client,
-    kb_roles_with_tests
+    kb_roles_with_tests,
+    get_chat_id
 ):
     """
     Test du scénario complet d'extraction depuis la knowledge base avec streaming.
@@ -22,11 +23,12 @@ def test_extract_from_knowledge_base_streaming(
     Parcourt tous les rôles KB configurés avec roles_test et teste chacun.
     
     Scénario:
-    1. Authentification OAuth2 automatique
-    2. Envoi d'une requête d'extraction à la KB (multipart/form-data)
-    3. Réception d'une réponse en streaming SSE
-    4. Validation de la structure des événements SSE
-    5. Vérification du contenu extrait
+    1. Génération d'un chat_id via l'endpoint get_chat_id_route
+    2. Authentification OAuth2 automatique
+    3. Envoi d'une requête d'extraction à la KB (multipart/form-data)
+    4. Réception d'une réponse en streaming SSE
+    5. Validation de la structure des événements SSE
+    6. Vérification du contenu extrait
     
     Validations:
     - Code HTTP 200
@@ -39,11 +41,19 @@ def test_extract_from_knowledge_base_streaming(
     for app, role_name, test_config in kb_roles_with_tests:
         print(f"\n🧪 Testing KB role '{role_name}' for app '{app['app_name']}'")
         
-        # Étape 1: Appel API avec multipart/form-data
+        # Étape 1: Générer un chat_id dynamique
+        chat_id = get_chat_id(app=app)
+        
+        # Créer la requête avec le chat_id généré et la question standard
+        request_data = test_config.copy()
+        request_data["chat_id"] = chat_id
+        request_data["user_question"] = "Which KB is this?"
+        
+        # Étape 2: Appel API avec multipart/form-data
         response = api_client.post(
             endpoint="/extract_from_knowledge_base",
             app=app,
-            data=test_config,  # utilise la config du role_test
+            data=request_data,
             stream=True
         )
     
@@ -100,12 +110,23 @@ def test_extract_from_knowledge_base_streaming(
             f"[{role_name}] No content extracted from knowledge base"
         )
         
+        # Étape 8: Validation métier - Le contenu doit contenir le nom du rôle (key de roles_test)
+        full_content_lower = full_content.lower()
+        role_name_lower = role_name.lower()
+        
+        assert role_name_lower in full_content_lower, (
+            f"[{role_name}] Expected role name '{role_name}' to be found in KB response. "
+            f"Content preview: {full_content[:200]}..."
+        )
+        
         print(f"   ✅ Role '{role_name}' test passed:")
         print(f"      - App: {app['app_name']}")
+        print(f"      - Chat ID: {chat_id}")
         print(f"      - KB ID: {test_config.get('kb_id', 'N/A')}")
-        print(f"      - Question: {test_config.get('user_question', 'N/A')}")
+        print(f"      - Question: Which KB is this?")
         print(f"      - SSE events received: {len(sse_events)}")
         print(f"      - Total content length: {len(full_content)} chars")
+        print(f"      - Role name '{role_name}' found in response: ✅")
         print(f"      - Content preview: {full_content[:100]}...")
 
 
@@ -152,7 +173,8 @@ def test_extract_from_knowledge_base_missing_params(
 
 def test_extract_from_knowledge_base_all_configured_kbs(
     api_client,
-    kb_roles_with_tests
+    kb_roles_with_tests,
+    get_chat_id
 ):
     """
     Test avec toutes les KBs configurées dans roles_test.
@@ -170,10 +192,16 @@ def test_extract_from_knowledge_base_all_configured_kbs(
             print(f"⚠️  Skipping {role_name}: no kb_id in roles_test")
             continue
         
+        # Générer un chat_id dynamique pour chaque test
+        chat_id = get_chat_id(app=app)
+        request_data = test_config.copy()
+        request_data["chat_id"] = chat_id
+        request_data["user_question"] = "Which KB is this?"
+        
         response = api_client.post(
             endpoint="/extract_from_knowledge_base",
             app=app,
-            data=test_config,
+            data=request_data,
             stream=True
         )
         

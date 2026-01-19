@@ -5,6 +5,7 @@ Architecture modulaire et agnostique réutilisable pour tester n'importe
 quelle API REST avec authentification OAuth2.
 """
 import pytest
+import uuid
 from typing import List, Dict, Any, Callable
 
 from fixtures.config import Config
@@ -96,10 +97,49 @@ def api_client(base_url: str) -> APIClient:
 # Fixtures utilitaires
 # ============================================================================
 
+@pytest.fixture(scope="function")
+def get_chat_id(api_client, apps):
+    """
+    Génère un nouveau chat_id en appelant l'endpoint get_chat_id_route.
+    Retourne une fonction callable qui génère un nouveau chat_id pour chaque appel.
+    
+    Returns:
+        callable: Fonction qui retourne un chat_id en appelant l'API
+    """
+    def _get_chat_id(app=None):
+        """Génère un nouveau chat_id via l'API."""
+        # Si aucune app n'est fournie, utiliser la première disponible
+        target_app = app or apps[0]
+        
+        try:
+            response = api_client.get(
+                endpoint="/get_chat_id",
+                app=target_app
+            )
+            
+            if response.status_code == 200:
+                chat_id = response.text.strip()
+                print(f"   🆔 Generated chat_id: {chat_id}")
+                return chat_id
+            else:
+                # Fallback si l'endpoint n'est pas disponible
+                fallback_id = f"test-{uuid.uuid4().hex[:12]}"
+                print(f"   ⚠️  get_chat_id returned {response.status_code}, using fallback: {fallback_id}")
+                return fallback_id
+                
+        except Exception as e:
+            # Fallback en cas d'erreur
+            fallback_id = f"test-{uuid.uuid4().hex[:12]}"
+            print(f"   ⚠️  Error calling get_chat_id: {e}, using fallback: {fallback_id}")
+            return fallback_id
+    
+    return _get_chat_id
+
+
 @pytest.fixture
-def chat_id() -> str:
-    """ID de chat par défaut pour les tests."""
-    return "test_chat_integration_12345"
+def chat_id(get_chat_id) -> str:
+    """ID de chat dynamique pour les tests (génère un nouveau chat_id via l'API)."""
+    return get_chat_id()
 
 
 # ============================================================================
