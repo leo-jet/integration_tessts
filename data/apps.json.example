@@ -12,6 +12,15 @@
       "crm_visit_report",
       "crm_visit_report_tester"
     ],
+    "roles_test": {
+      "crm_visit_report": {
+        "chat_id": "test_crm_12345",
+        "user_question": "Customer meeting about new products and delivery issues",
+        "target_lang": "en",
+        "client_id": "12345",
+        "client_segment": "IND"
+      }
+    },
     "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
     "oauth_config": {
       "client_id_env_var": "APP_CLIENT_ID",
@@ -32,8 +41,19 @@
     "lang": "en",
     "webshop": "example.com",
     "roles": [
-      "chat_history"
+      "chat_history",
+      "knowledge_base"
     ],
+    "roles_test": {
+      "chat_history": {
+        "chat_id": "test_chat_history_12345"
+      },
+      "knowledge_base": {
+        "kb_id": "en - Documentation",
+        "user_question": "How do I create a quote?",
+        "chat_id": "test_kb_en_12345"
+      }
+    },
     "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
     "oauth_config": {
       "client_id_env_var": "APP_CLIENT_ID",
@@ -56,6 +76,11 @@
     "roles": [
       "chat_history"
     ],
+    "roles_test": {
+      "chat_history": {
+        "chat_id": "test_mutualized_12345"
+      }
+    },
     "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
     "oauth_config": {
       "client_id_env_var": "APP_CLIENT_ID",
@@ -78,6 +103,11 @@
     "roles": [
       "chat_history"
     ],
+    "roles_test": {
+      "chat_history": {
+        "chat_id": "test_user_app_12345"
+      }
+    },
     "ocp_apim_subscription_key": "YOUR_API_SUBSCRIPTION_KEY_HERE",
     "oauth_config": {
       "client_id_env_var": "USER_APP_CLIENT_ID",

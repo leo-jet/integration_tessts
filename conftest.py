@@ -10,6 +10,13 @@ from typing import List, Dict, Any, Callable
 from fixtures.config import Config
 from fixtures.apps import app_loader
 from fixtures.api_client import APIClient
+from fixtures.schemas import (
+    CrmVisitReportResponseSchema,
+    ChatItemSchema,
+    LoadPreviousChatResponseSchema,
+    ErrorResponseSchema,
+    KBExtractResponseSchema
+)
 
 
 # ============================================================================
@@ -94,3 +101,37 @@ def api_client(base_url: str) -> APIClient:
 def chat_id() -> str:
     """ID de chat par défaut pour les tests."""
     return "test_chat_integration_12345"
+
+
+# ============================================================================
+# Fixtures pour les schémas de validation
+# ============================================================================
+
+@pytest.fixture(scope="session")
+def crm_visit_report_schema():
+    """Schéma de validation pour les réponses CRM visit report."""
+    return CrmVisitReportResponseSchema()
+
+
+@pytest.fixture(scope="session")
+def chat_item_schema():
+    """Schéma de validation pour les items de chat."""
+    return ChatItemSchema()
+
+
+@pytest.fixture(scope="session")
+def load_previous_chat_schema():
+    """Schéma de validation pour les réponses load_previous_chat."""
+    return LoadPreviousChatResponseSchema()
+
+
+@pytest.fixture(scope="session")
+def error_response_schema():
+    """Schéma de validation pour les réponses d'erreur."""
+    return ErrorResponseSchema()
+
+
+@pytest.fixture(scope="session")
+def kb_extract_response_schema():
+    """Schéma de validation pour les réponses extract_from_kb."""
+    return KBExtractResponseSchema()

@@ -28,6 +28,10 @@ integration_tests/
 │   ├── test_load_previous_chat.py # Test chargement d'un chat
 │   └── test_load_previous_chat_unauthorized.py # Test accès refusé
 │
+├── test_extract_from_kb/         # Tests Knowledge Base
+│   ├── conftest.py              # Fixtures spécifiques KB
+│   └── test_business_scenario.py # Test extraction KB
+│
 ├── conftest.py                   # Fixtures globales
 ├── requirements.txt              # Dépendances
 ├── .env.example                  # Template variables d'environnement
@@ -50,6 +54,13 @@ integration_tests/
    - ✅ Test de mutualisation des chats (mutualize_with)
    - ✅ Validation Marshmallow des réponses
    - ✅ Vérification de la structure des messages
+
+### ✅ Knowledge Base - `/extract_from_knowledge_base`
+   - ✅ Test d'extraction depuis la knowledge base avec streaming SSE
+   - ✅ Validation du format Server-Sent Events
+   - ✅ Vérification du contenu extrait
+   - ✅ Test avec différents kb_id
+   - ✅ Test avec paramètres manquants (400)
 
 ## 🚀 Quick Start
 
@@ -81,16 +92,19 @@ cp data/apps.json.example data/apps.json
 ```
 
 ### 4. Lancer les tests
-Tests Common (fetch_history)
-pytest test_common/ -v
 
+```bash
 # Tous les tests
 pytest -v
 
-# Avec logs détaillés
-pytest
 # Tests CRM
 pytest test_crm_visit_report/ -v
+
+# Tests Common (fetch_history)
+pytest test_common/ -v
+
+# Tests Knowledge Base
+pytest test_extract_from_kb/ -v
 
 # Avec logs détaillés
 pytest test_crm_visit_report/ -v -s
@@ -134,7 +148,6 @@ pytest test_crm_visit_report/ -v -s
 ## 🔮 Prochaines étapes
 
 Cette architecture modulaire est prête à être réutilisée pour migrer les autres endpoints :
-- Knowledge Base
 - Chatbot Expert
 - Products Search
-- Common endpoints
+- Autres endpoints spécifiques

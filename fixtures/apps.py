@@ -34,6 +34,7 @@ class AppSchema(Schema):
     lang = fields.Str(required=False)
     webshop = fields.Str(required=False)
     roles = fields.List(fields.Str(), required=True)
+    roles_test = fields.Dict(keys=fields.Str(), values=fields.Dict(), required=False)
     ocp_apim_subscription_key = fields.Str(required=True)
     oauth_config = fields.Nested(OAuthConfigSchema, required=True)
     fetch_history = fields.Int(required=False)
