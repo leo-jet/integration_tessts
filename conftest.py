@@ -14,8 +14,7 @@ from fixtures.schemas import (
     CrmVisitReportResponseSchema,
     ChatItemSchema,
     LoadPreviousChatResponseSchema,
-    ErrorResponseSchema,
-    KBExtractResponseSchema
+    ErrorResponseSchema
 )
 
 
@@ -129,9 +128,3 @@ def load_previous_chat_schema():
 def error_response_schema():
     """Schéma de validation pour les réponses d'erreur."""
     return ErrorResponseSchema()
-
-
-@pytest.fixture(scope="session")
-def kb_extract_response_schema():
-    """Schéma de validation pour les réponses extract_from_kb."""
-    return KBExtractResponseSchema()
