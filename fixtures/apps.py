@@ -13,9 +13,14 @@ from marshmallow import Schema, fields, ValidationError, validates_schema
 class OAuthConfigSchema(Schema):
     """Schéma de validation pour oauth_config."""
     client_id_env_var = fields.Str(required=True)
-    client_secret_env_var = fields.Str(required=True)
+    client_secret_env_var = fields.Str(required=False)  # Optionnel pour MSAL user flow
     tenant_id = fields.Str(required=True)
     scope = fields.Str(required=True)
+    
+    # Champs spécifiques pour MSAL (role_priority="user")
+    authority = fields.Str(required=False)  # Ex: "https://login.microsoftonline.com/tenant_id"
+    apim_scope = fields.Str(required=False)  # Scope spécifique pour APIM
+    user_token_env_var = fields.Str(required=False)  # Variable contenant le token user pré-généré
 
 
 class AppSchema(Schema):

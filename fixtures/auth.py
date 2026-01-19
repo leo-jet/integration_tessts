@@ -26,8 +26,12 @@ class OAuth2Client:
         """
         Obtient un access token OAuth2 pour une application.
         
+        Supporte deux modes :
+        - role_priority="app" : OAuth2 client credentials flow
+        - role_priority="user" : Token MSAL pré-généré ou mock
+        
         Args:
-            app: Dictionnaire contenant oauth_config avec client_id_env_var et client_secret_env_var
+            app: Dictionnaire contenant oauth_config et role_priority
             
         Returns:
             str: Access token valide
@@ -35,7 +39,79 @@ class OAuth2Client:
         Raises:
             AuthenticationError: Si l'authentification échoue
         """
+        role_priority = app.get("role_priority", "app")
         oauth_config = app.get("oauth_config", {})
+        
+        # Mode user : utiliser un token pré-généré via MSAL
+        if role_priority == "user":
+            return self._get_user_token(app, oauth_config)
+        
+        # Mode app : OAuth2 client credentials
+        return self._get_app_token(app, oauth_config)
+    
+    def _get_user_token(self, app: Dict[str, Any], oauth_config: Dict[str, Any]) -> str:
+        """
+        Obtient un token pour une application user (MSAL).
+        
+        Pour les tests, on utilise un token pré-généré stocké dans une variable d'environnement.
+        En production, ce token serait obtenu via MSAL interactive flow.
+        
+        Args:
+            app: Application configuration
+            oauth_config: Configuration OAuth
+            
+        Returns:
+            str: Access token
+            
+        Raises:
+            AuthenticationError: Si le token n'est pas disponible
+        """
+        # Essayer de récupérer un token pré-généré
+        user_token_env_var = oauth_config.get("user_token_env_var")
+        
+        if user_token_env_var:
+            token = os.getenv(user_token_env_var)
+            if token:
+                return token
+        
+        # Fallback: générer un mock token pour les tests
+        # En production, vous devriez utiliser MSAL pour obtenir un vrai token
+        client_id = oauth_config.get("client_id_env_var")
+        authority = oauth_config.get("authority")
+        apim_scope = oauth_config.get("apim_scope", oauth_config.get("scope"))
+        
+        # Pour les tests, accepter un token mock si configuré
+        mock_token_env = "MOCK_USER_TOKEN"
+        mock_token = os.getenv(mock_token_env)
+        if mock_token:
+            print(f"⚠️  Using mock token for user app (role_priority='user')")
+            return mock_token
+        
+        raise AuthenticationError(
+            f"No user token available for app {app.get('app_name')}. "
+            f"For testing, either:\n"
+            f"1. Set {user_token_env_var} with a real MSAL token\n"
+            f"2. Set {mock_token_env} with a mock token\n"
+            f"3. Generate a token using MSAL with:\n"
+            f"   - client_id: {os.getenv(client_id, 'N/A')}\n"
+            f"   - authority: {authority}\n"
+            f"   - scope: {apim_scope}"
+        )
+    
+    def _get_app_token(self, app: Dict[str, Any], oauth_config: Dict[str, Any]) -> str:
+        """
+        Obtient un token pour une application app (OAuth2 client credentials).
+        
+        Args:
+            app: Application configuration
+            oauth_config: Configuration OAuth
+            
+        Returns:
+            str: Access token
+            
+        Raises:
+            AuthenticationError: Si l'authentification échoue
+        """
         
         # Récupérer les variables d'environnement
         client_id_env = oauth_config.get("client_id_env_var")
@@ -45,7 +121,8 @@ class OAuth2Client:
         
         if not all([client_id_env, client_secret_env, tenant_id, scope]):
             raise AuthenticationError(
-                f"Missing OAuth config for app {app.get('app_name')}"
+                f"Missing OAuth config for app {app.get('app_name')}. "
+                f"Required: client_id_env_var, client_secret_env_var, tenant_id, scope"
             )
         
         client_id = os.getenv(client_id_env)

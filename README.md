@@ -98,7 +98,9 @@ pytest test_crm_visit_report/ -v -s
 
 ## 📚 Documentation détaillée
 
-Pour un guide complet d'installation et de troubleshooting, consultez [SETUP_CRM.md](SETUP_CRM.md)
+- [SETUP_CRM.md](SETUP_CRM.md) - Guide d'installation complet
+- [MSAL_AUTH.md](MSAL_AUTH.md) - Authentification MSAL pour apps user
+- [REVIEW.md](REVIEW.md) - Comparaison des architectures
 
 ## 🔧 Fixtures disponibles
 
