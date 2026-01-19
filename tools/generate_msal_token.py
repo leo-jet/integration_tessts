@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    from msal import PublicClientApplication
+    from msal import PublicClientApplication, ConfidentialClientApplication
 except ImportError:
     print("❌ MSAL not installed. Install it with: pip install msal")
     sys.exit(1)
@@ -24,50 +24,75 @@ except ImportError:
 def generate_msal_token(
     client_id: str,
     authority: str,
-    scopes: list
+    scopes: list,
+    client_secret: str = None
 ) -> str:
     """
-    Génère un token MSAL via device code flow.
+    Génère un token MSAL via device code flow ou client credentials.
     
     Args:
         client_id: Client ID de l'application
         authority: Authority URL (ex: https://login.microsoftonline.com/tenant_id)
         scopes: Liste des scopes requis
+        client_secret: Client secret (optionnel, pour ConfidentialClientApplication)
         
     Returns:
         str: Access token
     """
-    app = PublicClientApplication(
-        client_id=client_id,
-        authority=authority
-    )
-    
-    # Device code flow (interactif mais sans navigateur)
-    flow = app.initiate_device_flow(scopes=scopes)
-    
-    if "user_code" not in flow:
-        raise ValueError(
-            "Failed to create device flow. "
-            f"Error: {flow.get('error')}, {flow.get('error_description')}"
+    if client_secret:
+        # Application confidentielle avec client_secret
+        app = ConfidentialClientApplication(
+            client_id=client_id,
+            client_credential=client_secret,
+            authority=authority
         )
-    
-    print("\n" + "="*60)
-    print("🔐 MSAL Authentication - Device Code Flow")
-    print("="*60)
-    print(f"\n{flow['message']}\n")
-    print("Waiting for authentication...")
-    print("="*60 + "\n")
-    
-    # Attendre l'authentification
-    result = app.acquire_token_by_device_flow(flow)
-    
-    if "access_token" in result:
-        print("✅ Authentication successful!\n")
-        return result["access_token"]
+        
+        # Client credentials flow (pour app-to-app, pas device code)
+        result = app.acquire_token_for_client(scopes=scopes)
+        
+        if "access_token" in result:
+            print("✅ Authentication successful (client credentials)!\n")
+            return result["access_token"]
+        else:
+            error = result.get("error")
+            error_desc = result.get("error_description")
+            raise ValueError(f"Authentication failed: {error} - {error_desc}")
     else:
-        error = result.get("error")
-        error_desc = result.get("error_description")
-        raise ValueError(f"Authentication failed: {error} - {error_desc}")
+        # Application publique sans client_secret
+        app = PublicClientApplication(
+            client_id=client_id,
+            authority=authority
+        )
+        
+        # Device code flow (interactif)
+        flow = app.initiate_device_flow(scopes=scopes)
+    
+        # Device code flow (interactif)
+        flow = app.initiate_device_flow(scopes=scopes)
+    
+        if "user_code" not in flow:
+            raise ValueError(
+                "Failed to create device flow. "
+                f"Error: {flow.get('error')}, {flow.get('error_description')}"
+            )
+        
+        print("\n" + "="*60)
+        print("🔐 MSAL Authentication - Device Code Flow")
+        print("="*60)
+        print(f"\n{flow['message']}\n")
+        print("Waiting for authentication...")
+        print("="*60 + "\n")
+        
+        # Attendre l'authentification
+        result = app.acquire_token_by_device_flow(flow)
+        
+        if "access_token" in result:
+            print("✅ Authentication successful!\n")
+            return result["access_token"]
+        else:
+            error = result.get("error")
+            error_desc = result.get("error_description")
+            raise ValueError(f"Authentication failed: {error} - {error_desc}")
 
 
 def main():
@@ -76,9 +101,7 @@ def main():
     print("\n" + "="*60)
     print("MSAL Token Generator for Integration Tests")
     print("="*60 + "\n")
-    
-    # Récupérer la configuration depuis .env
-    client_id = os.getenv("USER_APP_CLIENT_ID")
+    client_secret = os.getenv("USER_APP_CLIENT_SECRET")  # Optionnel
     tenant_id = os.getenv("AZURE_TENANT_ID")
     apim_scope = os.getenv("APIM_SCOPE")
     
@@ -100,11 +123,17 @@ def main():
     # Utiliser le scope APIM depuis .env
     scopes = [apim_scope]
     
+    auth_type = "Client Credentials (with secret)" if client_secret else "Device Code Flow (no secret)"
+    
     print(f"\nConfiguration:")
     print(f"  Client ID: {client_id}")
     print(f"  Authority: {authority}")
     print(f"  Scopes: {scopes}")
+    print(f"  Auth Type: {auth_type}")
     print()
+    
+    try:
+        token = generate_msal_token(client_id, authority, scopes, client_secret
     
     try:
         token = generate_msal_token(client_id, authority, scopes)
