@@ -76,9 +76,12 @@ class OAuth2Client:
         
         # Fallback: générer un mock token pour les tests
         # En production, vous devriez utiliser MSAL pour obtenir un vrai token
-        client_id = oauth_config.get("client_id_env_var")
+        client_id_env = oauth_config.get("client_id_env_var")
         authority = oauth_config.get("authority")
-        apim_scope = oauth_config.get("apim_scope", oauth_config.get("scope"))
+        
+        # Lire l'APIM scope depuis les variables d'environnement
+        apim_scope_env = oauth_config.get("apim_scope_env_var", "APIM_SCOPE")
+        apim_scope = os.getenv(apim_scope_env, oauth_config.get("scope"))
         
         # Pour les tests, accepter un token mock si configuré
         mock_token_env = "MOCK_USER_TOKEN"
@@ -93,9 +96,9 @@ class OAuth2Client:
             f"1. Set {user_token_env_var} with a real MSAL token\n"
             f"2. Set {mock_token_env} with a mock token\n"
             f"3. Generate a token using MSAL with:\n"
-            f"   - client_id: {os.getenv(client_id, 'N/A')}\n"
+            f"   - client_id: {os.getenv(client_id_env, 'N/A')}\n"
             f"   - authority: {authority}\n"
-            f"   - scope: {apim_scope}"
+            f"   - apim_scope (from env ${apim_scope_env}): {apim_scope}"
         )
     
     def _get_app_token(self, app: Dict[str, Any], oauth_config: Dict[str, Any]) -> str:

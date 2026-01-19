@@ -114,7 +114,7 @@
       "tenant_id": "00000000-0000-0000-0000-000000000000",
       "authority": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000",
       "scope": "api://00000000-0000-0000-0000-000000000000/.default",
-      "apim_scope": "https://management.azure.com/.default",
+      "apim_scope_env_var": "APIM_SCOPE",
       "user_token_env_var": "USER_APP_MSAL_TOKEN"
     },
     "fetch_history": 1,

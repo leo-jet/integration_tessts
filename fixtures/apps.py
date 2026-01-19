@@ -19,7 +19,7 @@ class OAuthConfigSchema(Schema):
     
     # Champs spécifiques pour MSAL (role_priority="user")
     authority = fields.Str(required=False)  # Ex: "https://login.microsoftonline.com/tenant_id"
-    apim_scope = fields.Str(required=False)  # Scope spécifique pour APIM
+    apim_scope_env_var = fields.Str(required=False)  # Variable d'env contenant le scope APIM
     user_token_env_var = fields.Str(required=False)  # Variable contenant le token user pré-généré
 
 
