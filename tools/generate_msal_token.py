@@ -80,6 +80,7 @@ def main():
     # Récupérer la configuration depuis .env
     client_id = os.getenv("USER_APP_CLIENT_ID")
     tenant_id = os.getenv("AZURE_TENANT_ID")
+    apim_scope = os.getenv("APIM_SCOPE")
     
     if not client_id:
         print("❌ USER_APP_CLIENT_ID not found in .env file")
@@ -89,17 +90,15 @@ def main():
         print("❌ AZURE_TENANT_ID not found in .env file")
         sys.exit(1)
     
+    if not apim_scope:
+        print("❌ APIM_SCOPE not found in .env file")
+        print("   Add: APIM_SCOPE=https://management.azure.com/.default")
+        sys.exit(1)
+    
     authority = f"https://login.microsoftonline.com/{tenant_id}"
     
-    # Scopes par défaut
-    scope_input = input(
-        "Enter scope (default: api://00000000-0000-0000-0000-000000000000/.default): "
-    ).strip()
-    
-    if not scope_input:
-        scope_input = "api://00000000-0000-0000-0000-000000000000/.default"
-    
-    scopes = [scope_input]
+    # Utiliser le scope APIM depuis .env
+    scopes = [apim_scope]
     
     print(f"\nConfiguration:")
     print(f"  Client ID: {client_id}")
