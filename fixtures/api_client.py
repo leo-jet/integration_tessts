@@ -43,6 +43,15 @@ class APIClient:
             "Ocp-Apim-Subscription-Key": app["ocp_apim_subscription_key"]
         }
         
+        # En mode MOCK_AUTH, ajouter les headers de simulation
+        if Config.MOCK_AUTH:
+            # App-Id est ajouté pour toutes les requêtes
+            headers["App-Id"] = app.get("app_id", "mock-app-id")
+            
+            # Unique-Name est ajouté uniquement pour les apps avec role_priority=user
+            if app.get("role_priority") == "user":
+                headers["Unique-Name"] = app.get("unique_name", "mock-user@example.com")
+        
         if extra_headers:
             headers.update(extra_headers)
         
