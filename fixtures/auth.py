@@ -26,7 +26,8 @@ class OAuth2Client:
         """
         Obtient un access token OAuth2 pour une application.
         
-        Supporte deux modes :
+        Supporte trois modes :
+        - MOCK_AUTH=true : Retourne un token mock (bypass authentification)
         - role_priority="app" : OAuth2 client credentials flow
         - role_priority="user" : Token MSAL pré-généré ou mock
         
@@ -39,6 +40,11 @@ class OAuth2Client:
         Raises:
             AuthenticationError: Si l'authentification échoue
         """
+        # Mode mock global : bypass toute authentification
+        if Config.MOCK_AUTH:
+            print(f"🔓 MOCK_AUTH enabled - using mock token for {app.get('app_name', 'unknown')}")
+            return Config.MOCK_TOKEN
+        
         role_priority = app.get("role_priority", "app")
         oauth_config = app.get("oauth_config", {})
         

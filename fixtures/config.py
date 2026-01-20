@@ -22,6 +22,12 @@ class Config:
     # Azure OAuth Configuration (optionnel si tenant_id est dans apps.json)
     AZURE_TENANT_ID: str = os.getenv("AZURE_TENANT_ID", "")
     
+    # Mock Authentication Configuration
+    # Set MOCK_AUTH=true to bypass real authentication and use a mock token
+    MOCK_AUTH: bool = os.getenv("MOCK_AUTH", "false").lower() in ("true", "1", "yes")
+    # Token to use when MOCK_AUTH is enabled (defaults to a placeholder)
+    MOCK_TOKEN: str = os.getenv("MOCK_TOKEN", "mock-token-for-testing")
+    
     # Retry Configuration
     RETRY_MAX_ATTEMPTS: int = int(os.getenv("RETRY_MAX_ATTEMPTS", "3"))
     RETRY_BACKOFF_FACTOR: float = float(os.getenv("RETRY_BACKOFF_FACTOR", "2.0"))
