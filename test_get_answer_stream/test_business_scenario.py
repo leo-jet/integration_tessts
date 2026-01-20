@@ -91,22 +91,27 @@ def test_get_answer_stream_basic(
         # Étape 7: Validation métier - Structure des événements
         for idx, event in enumerate(sse_events):
             if "raw" not in event:
-                # Événements structurés doivent avoir role et/ou content
-                assert "role" in event or "content" in event, (
-                    f"[{role_name}] Event {idx}: missing 'role' or 'content' field. Event: {event}"
+                # Événements structurés doivent avoir role/content OU event_type/answer
+                has_legacy_format = "role" in event or "content" in event
+                has_new_format = "event_type" in event or "answer" in event
+                assert has_legacy_format or has_new_format, (
+                    f"[{role_name}] Event {idx}: missing expected fields. Event: {event}"
                 )
                 
-                if "content" in event:
-                    content = event.get("content")
-                    assert content is not None, (
-                        f"[{role_name}] Event {idx}: content is None"
+                # Vérifier le contenu selon le format
+                content = event.get("content") or event.get("answer")
+                if content is not None:
+                    assert isinstance(content, str), (
+                        f"[{role_name}] Event {idx}: content/answer must be a string"
                     )
         
         # Étape 8: Validation métier - Extraire le contenu complet
         full_content = ""
         for event in sse_events:
-            if "content" in event:
-                full_content += event["content"]
+            # Supporter les deux formats: content (legacy) et answer (nouveau)
+            content = event.get("content") or event.get("answer") or ""
+            if content:
+                full_content += content
         
         assert len(full_content) > 0, (
             f"[{role_name}] No content received from chatbot"
@@ -267,11 +272,12 @@ def test_get_answer_stream_with_model_parameters(
     # Valider qu'on a reçu des événements
     assert len(sse_events) > 0, "No SSE events received"
     
-    # Extraire le contenu
+# Extraire le contenu (supporter les deux formats: content et answer)
     full_content = ""
     for event in sse_events:
-        if "content" in event:
-            full_content += event["content"]
+        content = event.get("content") or event.get("answer") or ""
+        if content:
+            full_content += content
     
     assert len(full_content) > 0, "No content received from chatbot"
     
