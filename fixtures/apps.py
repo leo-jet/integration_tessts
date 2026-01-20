@@ -25,7 +25,7 @@ class OAuthConfigSchema(Schema):
 
 class AppSchema(Schema):
     """Schéma de validation pour une application."""
-    app_id = fields.UUID(required=True)
+    app_id = fields.Str(required=True)
     app_name = fields.Str(required=True)
     date = fields.Str(required=False)
     role_priority = fields.Str(required=True)
