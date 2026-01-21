@@ -73,6 +73,29 @@ SUPPORTED_LANGUAGES = [
 SUPPORTED_SEGMENTS = ["IND", "TER", "RES"]
 
 
+# ============================================================================
+# Schémas pour l'endpoint Products Search
+# ============================================================================
+
+class ProductResultSchema(Schema):
+    """Schéma pour un résultat de recherche produit."""
+    query = fields.Str(required=True)
+    product_rank = fields.Int(required=False, data_key="Product rank")
+    product_code = fields.Raw(required=False, data_key="Product code")  # Can be int or string
+    description = fields.Str(required=False, data_key="Description")
+    brand_name = fields.Str(required=False, allow_none=True)
+    similarity_score = fields.Float(required=False, data_key="Similarity score", allow_none=True)
+
+
+class ProductsSearchResponseSchema(Schema):
+    """Schéma de validation pour la réponse de /products-search."""
+    results = fields.List(fields.Nested(ProductResultSchema), required=True)
+
+
+# Modes de recherche supportés
+SUPPORTED_SEARCH_MODES = ["vector", "hybrid", "semantic"]
+
+
 def validate_language(lang: str) -> None:
     """Valide qu'une langue est supportée."""
     if lang not in SUPPORTED_LANGUAGES:
