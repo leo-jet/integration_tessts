@@ -75,10 +75,18 @@ class OAuth2Client:
         # Essayer de récupérer un token pré-généré
         user_token_env_var = oauth_config.get("user_token_env_var")
         
+        print(f"🔑 [AUTH] App: {app.get('app_name')} | role_priority: user")
+        print(f"🔑 [AUTH] Looking for token in env var: {user_token_env_var}")
+        
         if user_token_env_var:
             token = os.getenv(user_token_env_var)
             if token:
+                token_preview = f"{token[:20]}...{token[-10:]}" if len(token) > 30 else token
+                print(f"✅ [AUTH] Token found! Preview: {token_preview}")
+                print(f"✅ [AUTH] Token length: {len(token)} chars")
                 return token
+            else:
+                print(f"❌ [AUTH] Env var '{user_token_env_var}' is empty or not set!")
         
         # Fallback: générer un mock token pour les tests
         # En production, vous devriez utiliser MSAL pour obtenir un vrai token

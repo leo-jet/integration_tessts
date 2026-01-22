@@ -38,6 +38,12 @@ class APIClient:
         # Obtenir le token OAuth2
         access_token = oauth2_client.get_access_token(app)
         
+        # Log pour debug
+        token_preview = f"{access_token[:20]}...{access_token[-10:]}" if len(access_token) > 30 else access_token
+        print(f"📤 [REQUEST] Preparing headers for app: {app.get('app_name')}")
+        print(f"📤 [REQUEST] Authorization: Bearer {token_preview}")
+        print(f"📤 [REQUEST] Ocp-Apim-Subscription-Key: {app['ocp_apim_subscription_key'][:8]}...")
+        
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Ocp-Apim-Subscription-Key": app["ocp_apim_subscription_key"]
