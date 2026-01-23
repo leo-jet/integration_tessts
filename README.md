@@ -82,6 +82,8 @@ cp .env.example .env
 # - FRONTEND_CLIENT_SECRET
 ```
 
+> ⚠️ Les fichiers `.env.*` sont ignorés par Git pour des raisons de sécurité.
+
 ### 3. Configurer les applications
 
 ```bash
@@ -92,6 +94,8 @@ cp data/apps.json.example data/apps.json
 ```
 
 ### 4. Lancer les tests
+
+#### Via ligne de commande
 
 ```bash
 # Tous les tests
@@ -107,8 +111,29 @@ pytest test_common/ -v
 pytest test_extract_from_kb/ -v
 
 # Avec logs détaillés
-pytest test_crm_visit_report/ -v -s
+pytest test_crm_visit_report/ -v -s -o log_cli=true -o log_cli_level=INFO
 ```
+
+#### Via VS Code (configurations de debug)
+
+Le projet inclut des configurations de lancement VS Code dans `.vscode/launch.json` :
+
+| Configuration | Test | Env |
+|---------------|------|-----|
+| `Python: Pytest get chat id` | test_get_chat_id.py | DEV |
+| `Python: Pytest get answer stream` | test_get_answer_stream_all_scenarios.py | DEV |
+| `Python: Pytest get recent chats` | test_get_recent_chats_scenarios.py | UAT |
+| `Python: Pytest CRM` | test_crm_visit_report/test_business_scenarios.py | UAT |
+| `Pytest extract from kb` | test_extract_from_kb/test_business_scenario.py | UAT |
+| `Pytest get answer stream` | test_get_answer_stream/test_business_scenario.py | UAT |
+| `Pytest get recent chat` | test_common/test_get_recent_chats.py | UAT |
+| `Pytest get recent chat : unauthorized apps` | test_common/test_get_recent_chats_unauthorized.py | UAT |
+
+Pour lancer un test en debug :
+1. Ouvrir VS Code
+2. Aller dans l'onglet **Run and Debug** (Ctrl+Shift+D)
+3. Sélectionner la configuration souhaitée
+4. Appuyer sur **F5**
 
 ## 📚 Documentation détaillée
 
