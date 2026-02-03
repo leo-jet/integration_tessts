@@ -12,17 +12,28 @@ from fixtures.schemas import (
     SUPPORTED_LANGUAGES,
     SUPPORTED_SEGMENTS
 )
+from fixtures.apps import app_loader
 
 
-@pytest.fixture(scope="module")
-def crm_apps_role_priority_app(filter_apps_by) -> List[Dict[str, Any]]:
+def _get_crm_apps_role_priority_app() -> List[Dict[str, Any]]:
     """
     Retourne les applications avec role_priority='app' autorisées pour CRM.
     
     Returns:
         Liste des apps avec le rôle crm_visit_report et role_priority='app'
     """
-    apps = filter_apps_by(role="crm_visit_report", role_priority="app")
+    return app_loader.filter_apps(role="crm_visit_report", role_priority="app")
+
+
+@pytest.fixture(scope="module")
+def crm_apps_role_priority_app() -> List[Dict[str, Any]]:
+    """
+    Retourne les applications avec role_priority='app' autorisées pour CRM.
+    
+    Returns:
+        Liste des apps avec le rôle crm_visit_report et role_priority='app'
+    """
+    apps = _get_crm_apps_role_priority_app()
     
     if not apps:
         pytest.skip("No apps found with role='crm_visit_report' and role_priority='app'")
@@ -30,15 +41,27 @@ def crm_apps_role_priority_app(filter_apps_by) -> List[Dict[str, Any]]:
     return apps
 
 
-@pytest.fixture
-def crm_app_authorized(crm_apps_role_priority_app) -> Dict[str, Any]:
+def pytest_generate_tests(metafunc):
     """
-    Retourne une application autorisée pour CRM (première trouvée).
-    
-    Returns:
-        Dict représentant une app autorisée
+    Génère dynamiquement les paramètres de test pour toutes les apps autorisées.
+    Permet de tester chaque app individuellement avec un ID de test clair.
     """
-    return crm_apps_role_priority_app[0]
+    if "crm_app_authorized" in metafunc.fixturenames:
+        apps = _get_crm_apps_role_priority_app()
+        
+        if apps:
+            # Paramétrer le test avec toutes les apps, en utilisant app_name comme ID
+            metafunc.parametrize(
+                "crm_app_authorized",
+                apps,
+                ids=[app.get("app_name", f"app_{i}") for i, app in enumerate(apps)]
+            )
+        else:
+            # Si aucune app, paramétrer avec un skip
+            metafunc.parametrize(
+                "crm_app_authorized", 
+                [pytest.param(None, marks=pytest.mark.skip(reason="No apps found with role='crm_visit_report' and role_priority='app'"))]
+            )
 
 
 @pytest.fixture
